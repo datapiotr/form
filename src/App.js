@@ -2,68 +2,59 @@ import React, { useState } from 'react';
 
 function App() {
   const [name, setName] = useState('')
-  const [time, setTime] = useState('')
+  const [preparation_time, setPreparation_time] = useState('')
   const [type, setType] = useState('')
-  const [pizzaSlices, setPizzaSlices] = useState('')
+  const [no_of_slices, setNo_of_slices] = useState('')
   const [diameter, setDiameter] = useState('')
-  const [spiciness, setSpiciness] = useState('')
-  const [breadSlices, setBreadSlices] = useState('')
+  const [spiciness_scale, setSpiciness_scale] = useState('')
+  const [slices_of_bread, setSlices_of_bread] = useState('')
+  const [is_added, setIs_added] = useState(false)
 
-  const spicinessScale = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  const spicinessScaleArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-  const handleChangeName = (e) => {
-    setName(e.target.value)
-    console.log(name)
-  }
-  const handleChangeTime = (e) => {
-    setTime(e.target.value)
-    console.log(time)
-  }
-  const handleChangeType = (e) => {
-    setType(e.target.value)
-    console.log(type)
-  }
-  const handleChangePizzaSlices = (e) => {
-    setPizzaSlices(e.target.value)
-    console.log(pizzaSlices)
-  }
-  const handleChangeDiameter = (e) => {
-    setDiameter(e.target.value)
-    console.log(diameter)
-  }
-  const handleChangeSpiciness = (e) => {
-    setSpiciness(e.target.value)
-    console.log(spiciness)
-  }
-  const handleChangeBreadSlices = (e) => {
-    setBreadSlices(e.target.value)
-    console.log(breadSlices)
-  }
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log(name, time, type, pizzaSlices, diameter, spiciness, breadSlices)
+    const dish = { name, preparation_time, type, no_of_slices, diameter, spiciness_scale, slices_of_bread }
+
+    fetch('https://frosty-wood-6558.getsandbox.com/dishes', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dish)
+    }).then(() => {
+      setIs_added(true)
+    })
+
+    setName('')
+    setPreparation_time('')
+    setType('')
+    setNo_of_slices('')
+    setDiameter('')
+    setSpiciness_scale('')
+    setSlices_of_bread('')
   }
 
   return (
     <div className="App">
-      <form>
-        <label>Name: <input type="text" placeholder="dish name" value={name} onChange={handleChangeName}></input></label>
-        <label>Preparation time: <input type="number" placeholder="00:00:00" value={time} onChange={handleChangeTime}></input></label>
-        <label>Type: <select value={type} onChange={handleChangeType}><option></option><option>pizza</option><option>soup</option><option>sandwich</option></select></label>
+      <h2>Make a new order</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Name: <input type="text" required placeholder="dish name" value={name} onChange={(e) => setName(e.target.value)}></input></label>
+        <label>Preparation time: <input type="time" step="2" required placeholder="00:00:00" value={preparation_time} onChange={(e) => setPreparation_time(e.target.value)}></input></label>
+        <label>Type: <select required value={type} onChange={(e) => setType(e.target.value)}><option></option><option>pizza</option><option>soup</option><option>sandwich</option></select></label>
         {type === 'pizza' && (
           <>
-            <label>Number of slices: <input type="number" value={pizzaSlices} onChange={handleChangePizzaSlices}></input></label>
-            <label>Diameter: <input type="number" value={diameter} onChange={handleChangeDiameter}></input></label>
+            <label>Number of slices: <input type="number" min="0" required value={no_of_slices} onChange={(e) => setNo_of_slices(+e.target.value)}></input></label>
+            <label>Diameter: <input type="number" min="0" step="0.01" required value={diameter} onChange={(e) => setDiameter(+e.target.value)}></input></label>
           </>
         )}
         {type === 'soup' && (
-          <label>Spiciness scale: <select value={spiciness} onChange={handleChangeSpiciness}>{spicinessScale.map((number, index) => { return <option key={index}>{number}</option> })}</select></label>
+          <label>Spiciness scale: <select required value={spiciness_scale} onChange={(e) => setSpiciness_scale(+e.target.value)}>{spicinessScaleArray.map((number, index) => { return <option key={index}>{number}</option> })}</select></label>
         )}
         {type === 'sandwich' && (
-          <label>Slices of bread: <input type="number" value={breadSlices} onChange={handleChangeBreadSlices}></input></label>
+          <label>Slices of bread: <input type="number" min="0" required value={slices_of_bread} onChange={(e) => setSlices_of_bread(+e.target.value)}></input></label>
         )}
-        <button type="submit" onClick={handleSubmit}>Order</button>
+        <button>Order</button>
       </form>
+      <h3>{is_added ? `Your order has been added` : ''}</h3>
     </div>
   );
 }
