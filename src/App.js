@@ -20,9 +20,13 @@ function App() {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dish)
-    }).then(() => {
-      setIs_added(true)
-    })
+    }).then(response => response.json())
+      .then(() => {
+        setIs_added(true)
+      })
+      .catch(error => {
+        console.log(error);
+      });
 
     setName('')
     setPreparation_time('')
@@ -35,26 +39,34 @@ function App() {
 
   return (
     <div className="App">
-      <h2>Make a new order</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Name: <input type="text" required placeholder="dish name" value={name} onChange={(e) => setName(e.target.value)}></input></label>
-        <label>Preparation time: <input type="time" step="2" required placeholder="00:00:00" value={preparation_time} onChange={(e) => setPreparation_time(e.target.value)}></input></label>
-        <label>Type: <select required value={type} onChange={(e) => setType(e.target.value)}><option></option><option>pizza</option><option>soup</option><option>sandwich</option></select></label>
-        {type === 'pizza' && (
-          <>
-            <label>Number of slices: <input type="number" min="0" required value={no_of_slices} onChange={(e) => setNo_of_slices(+e.target.value)}></input></label>
-            <label>Diameter: <input type="number" min="0" step="0.01" required value={diameter} onChange={(e) => setDiameter(+e.target.value)}></input></label>
-          </>
-        )}
-        {type === 'soup' && (
-          <label>Spiciness scale: <select required value={spiciness_scale} onChange={(e) => setSpiciness_scale(+e.target.value)}>{spicinessScaleArray.map((number, index) => { return <option key={index}>{number}</option> })}</select></label>
-        )}
-        {type === 'sandwich' && (
-          <label>Slices of bread: <input type="number" min="0" required value={slices_of_bread} onChange={(e) => setSlices_of_bread(+e.target.value)}></input></label>
-        )}
-        <button>Order</button>
-      </form>
-      <h3>{is_added ? `Your order has been added` : ''}</h3>
+      {is_added ? (
+        <>
+          <h3>Your dish has been added</h3>
+          <button onClick={() => setIs_added(false)}>Create new order</button>
+        </>
+      ) : (
+        <>
+          <form onSubmit={handleSubmit}>
+            <h2>Make a new order</h2>
+            <label>Name: <input type="text" required value={name} onChange={(e) => setName(e.target.value)}></input></label>
+            <label>Preparation time: <input type="time" step="2" required value={preparation_time} onChange={(e) => setPreparation_time(e.target.value)}></input></label>
+            <label>Type: <select required value={type} onChange={(e) => setType(e.target.value)}><option></option><option>pizza</option><option>soup</option><option>sandwich</option></select></label>
+            {type === 'pizza' && (
+              <>
+                <label>Number of slices: <input type="number" min="0" required value={no_of_slices} onChange={(e) => setNo_of_slices(+e.target.value)}></input></label>
+                <label>Diameter: <input type="number" min="0" step="0.01" required value={diameter} onChange={(e) => setDiameter(+e.target.value)}></input></label>
+              </>
+            )}
+            {type === 'soup' && (
+              <label>Spiciness scale: <select required value={spiciness_scale} onChange={(e) => setSpiciness_scale(+e.target.value)}>{spicinessScaleArray.map((number, index) => { return <option key={index}>{number}</option> })}</select></label>
+            )}
+            {type === 'sandwich' && (
+              <label>Slices of bread: <input type="number" min="0" required value={slices_of_bread} onChange={(e) => setSlices_of_bread(+e.target.value)}></input></label>
+            )}
+            <button>Order</button>
+          </form>
+        </>
+      )}
     </div>
   );
 }
